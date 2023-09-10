@@ -1,0 +1,43 @@
+\documentclass{article}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\title{ECE421 - Problem Set 1}
+\author{Micol Altomare}
+\date{September 15, 2023} 
+
+\begin{document}
+	\maketitle
+\textbf{Problem 3}
+
+\hfill
+
+3.1. Computing the matrix product \textbf{AB} (where $\mathbf{A} \; \epsilon \; \mathbb{R}^{2 \times 3}$ and $\mathbf{B} \; \epsilon \; \mathbb{R}^{2 \times 3})$ is not possible since the inner dimensions are not equal. For $\mathbf{A} \; \epsilon \; \mathbb{R}^{a \times b}$ and $\mathbf{B} \; \epsilon \; \mathbb{R}^{c \times d}, b \neq c$.
+
+\hfill
+
+3.2. Given:
+\begin{align*}
+\mathbf{A} &= \begin{bmatrix} 2 & 4 & 6\\ 0 & -2 & 4 \end{bmatrix}
+\text{and} \;  
+\mathbf{B} = \begin{bmatrix} 2 & -0.5 \\ 1 & 0 \\ 1 & 0.5 \end{bmatrix}, \\
+\mathbf{AB} &= \begin{bmatrix} 2 & 4 & 6\\ 0 & -2 & 4 \end{bmatrix}  \begin{bmatrix} 2 & -0.5 \\ 1 & 0 \\ 1 & 0.5 \end{bmatrix} \\
+&= \begin{bmatrix} 14 & 2 \\ 2 & 2 \end{bmatrix}
+\end{align*}
+
+
+\hfill
+
+3.3 Given:
+\begin{align*}
+\mathbf{A} &= \begin{bmatrix} 4 & 0 & -2\\ 1 & 3 & -2 \\ 1 & 2 & -1 \end{bmatrix}, \\
+\mathbf{A} - \lambda \mathbf{I} &= \begin{bmatrix} 4 - \lambda & 0 & -2\\ 1 & 3-\lambda & -2 \\ 1 & 2 & -1-\lambda \end{bmatrix} \\
+det(\mathbf{A} - \lambda \mathbf{I}) &= (4-\lambda)[(3-\lambda)(-1-\lambda)+4]-2[2-(3-\lambda)] \\
+0 &= \boxed{-\lambda^3 + 6\lambda^2 - 11\lambda + 6} \; \text{is the characteristic polynomial}. \\
+&= -(\lambda-3)(\lambda-2)(\lambda-1) \\
+\implies & \boxed{\lambda_0 = 1, \lambda_1 = 2, \lambda_2 = 3} \; \text{are the eigenvalues of} \mathbf{A}.
+\end{align*}
+
+
+\end{document}
