@@ -3,7 +3,7 @@
 
 from sklearn.datasets import load_breast_cancer
 import numpy as np
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 # Problem 1
 
@@ -16,112 +16,54 @@ choice among the two we saw in class. Hand-in the code for full credit. For this
 question, you should not rely on any library other than NumPy in Python.
 '''
 
-# Load the breast cancer dataset (already is a numpy.ndarray)
+# Load the breast cancer dataset
 dataset = load_breast_cancer()
-data = dataset.data # data is a numpy array
-# or just load_breast_cancer().data
 
-def pick_k(dataset, num_clusters):
-    '''pick k'''
-    #for i in range(1, num_clusters):
-    #    # pick k random centroids from the dataset and name the aray clusters_i, where i is the cluster number based on the for loop
-    #    f'centroids_{i}' = np.random.choice(dataset, num_clusters, replace=False) # replace=False means no duplicates
-    global initial_centroids
-    initial_centroids = {}
-
-    for i in range(1, num_clusters + 1):
-        centroid_index = np.random.randint(0, len(dataset.data) - 1)
-        initial_centroids['centroids_' + str(i)] = dataset.data[centroid_index] # replace=False means no duplicates (to avoid duplicate centroids)
-        # remove the centroid from the dataset so that it is not chosen again
-        dataset.data = np.delete(dataset.data, centroid_index, axis=0)
-        
-        # run k-means, compute the distortion, pick centroids with the lowest distortion
-
-    return None # TODO: return k
-
-def k_means(dataset, k): # let k = 3
+def k_means(dataset, k):
     '''Implement the k-means clustering algorithm. The heuristic is choosing k random 
     initial centroids from the dataset.
     '''
     centroids = []
-    assignments = []
+    prev_centroids = np.zeros((k, len(dataset.data[0])))
     
-
     # Random initialization of k centroids
-    for i in range(k): #***checked and this loop works!
-        #print(dataset.data.shape)
-        #print(len(centroids)))
-        centroid_index = np.random.randint(0, len(dataset.data) - 1)
-        centroid_chosen = dataset.data[centroid_index] # initialize the centroids
-        print(centroid_chosen)
-        # add k_centroids to the centroids list
-        centroids.append(centroid_chosen)
-        print(centroids)
-        print(len(centroids))
-        # remove the centroid from the dataset so that it is not chosen again
-        dataset.data = np.delete(dataset.data, centroid_index, axis=0)
-        #print(dataset.data.shape)
-        #print(len(centroids))
+    for i in range(k): 
+        random_index = np.random.randint(0, len(dataset.data) - 1)
+        centroid_chosen = dataset.data[random_index] 
+        centroids.append(centroid_chosen) #***could clean up 
 
+    max_iterations = 10000
+    w = 0
+    
+    for w in range(max_iterations):
+        # while not np.allclose(centroids, prev_centroids): 
 
+        assignments = [[] for i in range(k)]
 
-    # Cluster assignment
+        print("Iteration: ", w)
 
-    for i in range(len(dataset.data)): #****checked and it works as expected!
-        prev_distance = 100000000
-        the_nearest_centroid = None
-
+        # Cluster assignment
         # compute the distance between each data point and each centroid
-        for centroid in centroids:
-            # compute the distance between dataset.data[i] and each centroid
-            distance = np.linalg.norm(dataset.data[i] - centroid)
-            print("Distance:" + str(distance))
-            print("Previous distance:" + str(prev_distance))
+        for point in dataset.data: 
+            distances = [np.linalg.norm(point - centroid) for centroid in centroids]
+            centroid_index = np.argmin(distances) # the index of the centroid with the minimum distance
+            assignments[centroid_index].append(point) # the point is assigned by adding it to the list of points whose centroid is the index in assignments
 
-            if distance < prev_distance:
-                the_nearest_centroid = centroid
-                print("New centroid and the distance was updated to the be the new distance.")
-                print("The nearest centroid:" + str(the_nearest_centroid))
-                print("The point:"+ str(dataset.data[i])) #***********
-                prev_distance = distance
-                print("New previous distance:" + str(prev_distance))
+        prev_centroids = np.copy(centroids)
 
-        # assign the data point to the nearest centroid
-        assignments.append([dataset.data[i], the_nearest_centroid])
-        print("The assignment:" + str(assignments[i])) #***********
-        print("The nearest centroid:" + str(the_nearest_centroid))
+        # Move centroids
+        for r in range(len(centroids)):    
+            # compute the mean of the assigned data points
+            mean = np.mean(np.array(assignments[r]), dtype=np.float64, axis=(0)) # column-wise # TODO: double-check
+            # move the centroid to the mean
+            centroids[r] = mean
+        
+        if np.allclose(centroids, prev_centroids, rtol=1e-09): # convergence check # TODO: use divergence instead?
+            print("Converged!")
+            break
 
-
-    # Move centroids
-    for centroid in centroids:
-        print("Current centroid:" + str(centroid))
-        # iterate through the dictionary and add any points whose centroid is centroid to a new list
-        corresponding_points = []
-        for i in range(len(assignments)):
-            print("The assignment: " + str(assignments[i]))
-            print("The centroid: " + str(assignments[i][1]))
-            print(type(assignments[i][1]))
-            print(type(centroid))
-            if np.array_equal(assignments[i][1], centroid):
-                corresponding_points.append(assignments[i][0])
-                print("Appended!")
-
-        print("The corresponding points:" + str(corresponding_points))
-        # compute the mean of the assigned data points
-        corresponding_points = np.array(corresponding_points)
-        print(type(corresponding_points))
-        print(len(corresponding_points))
-        # print the dimension of the array
-        print(corresponding_points.shape)
-        # compute the mean of the corresponding points along each axis
-        mean = np.mean(corresponding_points, dtype=np.ndarray, axis=(1)) # column-wise
-        print("Mean:"+ str(mean))
-        print(len(mean)) #***********
-        print(type(mean)) #***********
-        # move the centroid to the mean
-        centroid = mean
-        print(centroid)
-
+        w += 1
+        
     return centroids, assignments
 
 
@@ -131,9 +73,12 @@ def k_means(dataset, k): # let k = 3
 of 1. Justify in your answer which data you passed as the input to the κ-means algorithm.
 '''
 
-k_means(dataset, 3)
-for i in range(2, 7, 1):
-    print(k_means(dataset, i))
+for i in range(2, 8):
+    k_means(dataset, i)
+
+# I chose to pass in the entire dataset as the input to the k-means algorithm since
+# the dataset isn't computationally expensive and all the points can be used, via 
+# distortion to help determine the best value of k.
 
 
 # 1.3
@@ -143,9 +88,57 @@ at increments of 1. Hand-in the code and figure output for full credit. For this
 you may rely on plotting libraries such as matplotlib.
 '''
 
+def distortion(centroids, assignments):
+    '''
+    Compute the distortion (ie. minimize the objective) of the k-means clustering algorithm 
+    given the final (post-convergence) centroids and assignments.
+    '''
+    distances = [] # a list where each element is the distance between a point in the dataset and its centroid
+    total_distance = 0
+    m = 0
+    
+    print(len(assignments))
+    print(len(assignments[0]))
+
+    for i in range(len(centroids)): # iterate per centroid
+        # add the sum of the distances between each point (found in assignments[i]) and its centroid (centroids[i])
+        distances += [np.linalg.norm(its_point - centroids[i])**2 for its_point in assignments[i]] # TODO: verify distortion equation
+        m += len(assignments[i])
+
+    total_distance = sum(distances)
+    print("Total distance: ", total_distance)
+    print("m: ", m)
+
+    j = total_distance / m
+
+    return j
+
+
+# Run k-means and compute the distortion for each value of k
+k_vals = np.arange(2, 8, 1)
+j_vals = np.zeros(len(k_vals))
+
+for i in range(len(k_vals)):
+    print("=====================================")
+    print("Running k-means for k = ", k_vals[i], "...")
+    centroids, assignments = k_means(dataset, k_vals[i])
+    j_vals[i] = distortion(centroids, assignments)
+
+print("Done!")
+
+# Plot the k vs. distortion graph
+plt.plot(k_vals, j_vals)
+plt.xlabel('k-value')
+plt.ylabel('Distortion (J)')
+plt.show()
+
+print("Actually Done!")
+
 # 1.4
 '''
 (1 point) If you had to pick one value of κ, which value would you pick? Justify your choice.
 '''
-
-#if __name__ == "__main__":
+# I'd choose k = 4 since it is the point on the graph at which the distortion begins to level 
+# off (is minimized) and when real-world constraints would likely make it impractical to have 
+# more clusters.
+# TODO: verify my answer for k
