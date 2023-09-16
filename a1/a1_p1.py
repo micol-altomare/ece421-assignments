@@ -114,9 +114,11 @@ for i in range(len(k_vals)):
     j_vals[i] = distortion(centroids, assignments)
 
 # Plot the k vs. distortion graph
-plt.plot(k_vals, j_vals)
+plt.scatter(k_vals, j_vals)
+#plt.title('k vs. Distortion')
 plt.xlabel('k-value')
 plt.ylabel('Distortion (J)')
+plt.legend(['Distortion for each k'])
 plt.show()
 
 
