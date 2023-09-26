@@ -7,6 +7,8 @@
 \usepackage{tikz}
 \usepackage[top=0.9in, bottom=0.9in, left=1.5in, right=1.5in]{geometry}
 \usepackage{xcolor}
+\usepackage{xparse,mathtools}
+
 
 
 \title{ECE421 Problem Set 2}
@@ -19,7 +21,7 @@
 \maketitle
 
 
-\section{Problem 1}
+\section{Linear Regression}
 
 Given data:
 
@@ -51,12 +53,12 @@ Given data:
     \begin{axis}[
       xlabel={$x^{(i)}$},
       ylabel={$t^{(i)}$},
-      xmin=0, xmax=8, % Adjust the axis limits as needed
+      xmin=0, xmax=8, 
       ymin=0, ymax=12,
       xtick={1,2,3,4,5,6,7},
       ytick={1,2,3,4,5,6,7,8,9,10,11,12},
       grid=both,
-      mark=*, % Use asterisks as markers
+      mark=*,
       ]
       
       \addplot[only marks] table {
@@ -68,6 +70,10 @@ Given data:
         6 6
         7 10
       };
+      \addlegendentry{Dataset}
+	% question 1.5
+      %\addplot [dotted, domain=0:8, samples=2, ultra thick] {0.607142857*x + 2.142857143};
+      %\addlegendentry{Linear regression} //// mark=*????
     \end{axis}
   \end{tikzpicture}
   \caption{Scatter plot of $x^{(i)}$ vs. $t^{(i)}$}
@@ -81,13 +87,13 @@ Given data:
 &=  \frac{1}{2N} \sum_{i = 1}^{N} (wx^{(i)} - t^{(i)})^2 \\
 &= \frac{1}{2N}  \sum_{i = 1}^{N}  \left[ (wx^{(i)})^2 + wx^{(i)}b -wx^{(i)} t^{(i)} + wx^{(i)}b + b^2 - bt^{(i)} - wx^{(i)}t^{(i)} - t^{(i)}b + (t^{(i)})^2 \right] \\
 &= \frac{1}{2N}  \sum_{i = 1}^{N}  \left[ (w^2 x^{(i)})^2 + 2wx^{(i)} b - 2w x^{(i)} t^{(i)} - 2bt^{(i)} + b^2 + (t^{(i)})^2 \right] \\
-&= \frac{1}{2N}  \sum_{i = 1}^{N} \left[ \textcolor{blue}{(x^{(i)})^2} w^2 + \textcolor{blue}{1}b^2 + \textcolor{blue}{2x^{(i)}}wb  \textcolor{blue}{-2t^{(i)}x^{(i)}}w \textcolor{blue}{ -2t^{(i)}}b + \textcolor{blue}{(t^{(i)})^2}	\right] \\
+&= \boxed{ \frac{1}{2N}  \sum_{i = 1}^{N} \left[ \textcolor{blue}{(x^{(i)})^2} w^2 + \textcolor{blue}{1}b^2 + \textcolor{blue}{2x^{(i)}}wb  \textcolor{blue}{-2t^{(i)}x^{(i)}}w \textcolor{blue}{ -2t^{(i)}}b + \textcolor{blue}{(t^{(i)})^2}	\right] }\\
 \implies A_i &= (x^{(i)})^2, B_i = 1, C_i = 2x^{(i)}, D_i = -2t^{(i)}x^{(i)}, E_i = -2t^{(i)}, F_i = (t^{(i)})^2 \\
-\text{in} \; & \frac{1}{2N} \sum_{i = 1}^{N} A_i w^2 + B_i b^2 + C_i wb + D_i w + E_i b + F_i
+\text{in the form: } \; \mathcal{E} (w, b) &= \frac{1}{2N} \sum_{i = 1}^{N} A_i w^2 + B_i b^2 + C_i wb + D_i w + E_i b + F_i
 \end{align*}
 
 \subsection{}
-\noindent The loss function is minimized when $\frac{\partial \mathcal{E}}{\partial w} = 0$ and $\frac{\partial \mathcal{E}}{\partial b} = 0$. Where $A = \sum_i A_i,$ etc....
+\noindent The loss function is minimized when $\frac{\partial \mathcal{E}}{\partial w} = 0$ and $\frac{\partial \mathcal{E}}{\partial b} = 0$. Where $A = \sum_i A_i, \\ B =\sum_i B_i,  C =\sum_i C_i, D =\sum_i D_i, E =\sum_i E_i:$ 
 
 \begin{align}
 \frac{\partial \mathcal{E}}{\partial w} &=  \frac{1}{2N} \sum_{i = 1}^{N} 2wA_i + C_i b + D_i \\
@@ -96,26 +102,80 @@ Given data:
 \frac{\partial{\mathcal{E}}}{\partial b} &=  \frac{1}{2N} \sum_{i = 1}^{N} 2 B_i b + C_i w + E_i \\
 &= 2Bb + Cw + E = 0 \\
 \implies b &= \frac{-Cw -E}{2B} \\
-\implies w &= %%% solve
+\implies w &= \frac{-2Bb - E}{C} \\
+\implies & \boxed{b = \frac{2AE - CD}{C^2 - 4AB} ; w = \frac{2BD - CE}{C^2 - 4AB}} 
 \end{align}
 
 
 \subsection{}
-By plugging in numerical values from the dataset D (Table 1), the values are found to be approximately:
-\begin{align}
-w&=
-b &= 
-\end{align}
+By plugging in numerical values from the dataset D (Table 1) and using the results in \textbf{1.2} and \textbf{1.3}, the values are found to be approximately: $b$ = 2.1429 and $b$ = 0.6071.
+
 
 
 \subsection{}
-Using Excel's linear regression tool, it is found that $w$ = 2.1429 and $b$ = 0.6071.
+Using Excel's linear regression tool, it is found that $b$ = 2.1429 and $w$ = 0.6071.
 
 
+\begin{figure}[ht]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+      xlabel={$x^{(i)}$},
+      ylabel={$t^{(i)}$},
+      xmin=0, xmax=8, 
+      ymin=0, ymax=12,
+      xtick={1,2,3,4,5,6,7},
+      ytick={1,2,3,4,5,6,7,8,9,10,11,12},
+      grid=both,
+      mark=*,
+      ]
+      
+      \addplot[only marks] table {
+        1 6
+        2 4
+        3 2
+        4 1
+        5 3
+        6 6
+        7 10
+      };
+      \addlegendentry{Dataset}
+	% question 1.5
+      \addplot [dotted, domain=0:8, samples=2, ultra thick] {0.607142857*x + 2.142857143};
+      \addlegendentry{Linear regression} //// mark=*????
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Scatter plot of $x^{(i)}$ vs. $t^{(i)}$}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Problem 2}
+
+\section{Least Squares}
 \subsection{}
+\begin{align*}
+g_w(\vec{x}) &= \vec{x}\vec{w} \\
+&= \begin{bmatrix} x^{(i)} & 1 \end{bmatrix} \begin{bmatrix} w \\ b \end{bmatrix} \\ %%% check the index xi ***
+&= wx + (1)b \\
+&= g_{w, b} (x) \\
+\implies & \boxed{	 \vec{w} = 	 \begin{bmatrix} w \\ b \end{bmatrix}	} 
+\end{align*}
+
+
 \subsection{}
+
+\begin{align*}
+X\vec{w} - \vec{t} &=  \begin{bmatrix} x^{(1)} & 1 \\ x^{(2)} & 1 \\ \vdots & \vdots \\ x^{(N)} & 1 \end{bmatrix}  \begin{bmatrix} w \\ b \end{bmatrix} -  \begin{bmatrix} t^{(1)} \\ t^{(2)} \\ \vdots \\ t^{(N)} \end{bmatrix} \\
+&= \sum_{i=1}^N  \begin{bmatrix} x^{(i)} & 1 \end{bmatrix} \vec{w} - t^{(i)} \\
+&= \sum_{i=1}^N  x^{(i)} w + b - t^{(i)} \\
+\implies || X\vec{w} - \vec{t} ||^2 &= \sum_{i=1}^N  (x^{(i)} w + b - t^{(i)})^2 \\
+\nabla_w  || X\vec{w} - \vec{t} ||^2 = \frac{\partial || X\vec{w} - \vec{t} ||^2}{\partial w}
+\end{align*}
+
+
+
+
 \subsection{}
 \subsection{}
 \subsection{}
