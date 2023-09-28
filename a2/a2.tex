@@ -13,9 +13,8 @@
 
 \title{ECE421 Problem Set 2}
 \author{Micol Altomare}
-\date{} 
+\date{September 27, 2023} 
 
-%%% BEGIN DOCUMENT
 \begin{document}
 
 \maketitle
@@ -95,7 +94,7 @@ Given data:
 \subsection{}
 \noindent The loss function is minimized when $\frac{\partial \mathcal{E}}{\partial w} = 0$ and $\frac{\partial \mathcal{E}}{\partial b} = 0$. Where $A = \sum_i A_i, \\ B =\sum_i B_i,  C =\sum_i C_i, D =\sum_i D_i, E =\sum_i E_i:$ 
 
-\begin{align}
+\begin{align*}
 \frac{\partial \mathcal{E}}{\partial w} &=  \frac{1}{2N} \sum_{i = 1}^{N} 2wA_i + C_i b + D_i \\
 &= 2wA + Cb + D = 0 \\
 \implies w &= \frac{-Cb - D}{2A} \\
@@ -104,11 +103,11 @@ Given data:
 \implies b &= \frac{-Cw -E}{2B} \\
 \implies w &= \frac{-2Bb - E}{C} \\
 \implies & \boxed{b = \frac{2AE - CD}{C^2 - 4AB} ; w = \frac{2BD - CE}{C^2 - 4AB}} 
-\end{align}
+\end{align*}
 
 
 \subsection{}
-By plugging in numerical values from the dataset D (Table 1) and using the results in \textbf{1.2} and \textbf{1.3}, the values are found to be approximately: $b$ = 2.1429 and $b$ = 0.6071.
+By plugging in numerical values from the dataset D (Table 1) and using the results in \textbf{1.2} and \textbf{1.3}, the values are found to be approximately: $b$ = 2.1429 and $w$ = 0.6071.
 
 
 
@@ -170,24 +169,152 @@ X\vec{w} - \vec{t} &=  \begin{bmatrix} x^{(1)} & 1 \\ x^{(2)} & 1 \\ \vdots & \v
 &= \sum_{i=1}^N  \begin{bmatrix} x^{(i)} & 1 \end{bmatrix} \vec{w} - t^{(i)} \\
 &= \sum_{i=1}^N  x^{(i)} w + b - t^{(i)} \\
 \implies || X\vec{w} - \vec{t} ||^2 &= \sum_{i=1}^N  (x^{(i)} w + b - t^{(i)})^2 \\
-\nabla_w  || X\vec{w} - \vec{t} ||^2 = \frac{\partial || X\vec{w} - \vec{t} ||^2}{\partial w}
+\nabla_{\vec{w}}  || X\vec{w} - \vec{t} ||^2 &= \begin{bmatrix} \frac{\partial || X\vec{w} - \vec{t} ||^2}{\partial w} \\ \\ \frac{\partial || X\vec{w} - \vec{t} ||^2}{\partial b} \end{bmatrix} \\
+&= \begin{bmatrix} \sum_{i=1}^N  \frac{\partial }{\partial w} (x^{(i)} w + b - t^{(i)})^2 \\ \\  \sum_{i=1}^N  \frac{\partial }{\partial b} (x^{(i)} w + b - t^{(i)})^2 \end{bmatrix} \\
+&= \begin{bmatrix} \sum_{i=1}^N  2(x^{(i)} w + b - t^{(i)}) \cdot (x^{(i)}) \\  \sum_{i=1}^N  2(x^{(i)} w + b - t^{(i)}) \end{bmatrix} \\
+&= 2  \begin{bmatrix} x^{(i)} \\ 1 \end{bmatrix} ( X \vec{w} - \vec{t} ) \\
+&= \boxed{ 2 X^T (X \vec{w} - \vec{t}	)}
 \end{align*}
 
 
 
 
 \subsection{}
-\subsection{}
-\subsection{}
+Setting the derived loss function to zero,
+$$0 = 2 X^T (X \vec{w} - \vec{t}) $$
+{Thus $\vec{w^*}$ must satisfy: \\
+$$ 0 = 2 X^T X \vec{w^*} - 2 X^T \vec{t}$$
 
 
-\section{Problem 3}
 \subsection{}
+Assuming that $X^T X$ is invertible,
+\begin{align*}
+0 &= 2 X^T X \vec{w^*} - 2 X^T \vec{t} \\
+2 X^T \vec{t} &= 2 X^T X \vec{w^*} \\
+X^T \vec{t} &= X^T X \vec{w^*}  \\
+ \vec{w^*} &= (X^T X)^{-1} X^T \vec{t} 
+\end{align*}
+
+
+
+\section{Regularized Linear Regression Model}
+
 \subsection{}
+\begin{align*}
+A &= \sum_{i=1}^N \vec{x}^{(i)}   \vec{x}^{(i)^T} \\
+&= \sum_{i=1}^N \begin{bmatrix} x_1^{(i)} \\ \vdots \\ x_d^{(i)} \end{bmatrix} \begin{bmatrix} x_1^{(i)} & \cdots & x_d^{(i)} \end{bmatrix} \\ &= \sum_{i=1}^N \begin{bmatrix}
+x_1^{(i)} x_1^{(i)} & \cdots & x_1^{(i)} x_d^{(i)} \\
+\vdots & \ddots & \vdots \\
+x_d^{(i)} x_1^{(i)} & \cdots & x_d^{(i)} x_d^{(i)} 
+\end{bmatrix} \\
+&= \begin{bmatrix}
+x_1^{(1)} x_1^{(1)} & \cdots & x_1^{(1)} x_d^{(1)} \\
+\vdots & \ddots & \vdots \\
+x_d^{(1)} x_1^{(1)} & \cdots & x_d^{(1)} x_d^{(1)} 
+\end{bmatrix}
++
+\begin{bmatrix}
+x_1^{(2)} x_1^{(2)} & \cdots & x_1^{(2)} x_d^{(2)} \\
+\vdots & \ddots & \vdots \\
+x_d^{(2)} x_1^{(2)} & \cdots & x_d^{(2)} x_d^{(2)} 
+\end{bmatrix}
++ \cdots +
+\begin{bmatrix}
+x_1^{(N)} x_1^{(N)} & \cdots & x_1^{(N)} x_d^{(N)} \\
+\vdots & \ddots & \vdots \\
+x_d^{(N)} x_1^{(N)} & \cdots & x_d^{(N)} x_d^{(N)} 
+\end{bmatrix} \\
+\implies A &=  \begin{bmatrix}
+\sum_{i=1}^N x_1^{(i)} x_1^{(i)} & \cdots & \sum_{i=1}^N x_1^{(i)} x_d^{(i)} \\
+\vdots & \ddots & \vdots \\
+\sum_{i=1}^N x_d^{(i)} x_1^{(i)} & \cdots & \sum_{i=1}^N x_d^{(i)} x_d^{(i)} 
+\end{bmatrix}
+\end{align*}
+
+
+
+
+
+
 \subsection{}
+Given:
+\begin{align*}
+\mathcal{E}(\vec{w}, D) &= \frac{1}{2N} \sum_{i=1}^N (g_{\vec{w}} (\vec{x}^{(i)}) - t^{(i)} )^2 + \frac{\lambda}{2} || \vec{w} || _2^2 \\
+g_{\vec{w}} &= \vec{x^{(i)^T}} \vec{w} \\
+A &= \sum_{i=1}^N \vec{x}^{(i)}   \vec{x}^{(i)^T} \\
+\vec{b} &= \sum_{i=1}^N t^{(i)} \vec{x}^{(i)} \text{,} \\
+%%%
+\nabla \mathcal{E}(\vec{w}, D) &= \nabla \left( \frac{1}{2N} \sum_{i=1}^N g_{\vec{w}} (\vec{x}^{(i)}) - t^{(i)} )^2 + \frac{\lambda}{2} || \vec{w} || _2^2 \right) \\
+&= \nabla \left( \frac{1}{2N} \sum_{i=1}^N g_{\vec{w}} (\vec{x}^{(i)}) - t^{(i)} )^2 \right) + \nabla \left( \frac{\lambda}{2} || \vec{w} || _2^2 \right) \\
+&=  \frac{1}{2N} \sum_{i=1}^N \nabla \left( (\vec{x^{(i)^T}} \vec{w} - t^{(i)} )^2 \right) + \frac{\lambda}{2} 2w \\
+&=  \frac{1}{2N} \sum_{i=1}^N \nabla \left( ((\vec{x^{(i)^T}} \vec{w})^2 - 2 \vec{x^{(i)^T}} \vec{w} t^{(i)} + (t^{(i)})^2 )^2 \right) + \lambda w \\
+&= \frac{1}{N} ( \sum_{i=1}^N \vec{x}^{(i)}   \vec{x}^{(i)^T} \vec{w} - \sum_{i=1}^N t^{(i)} \vec{x}^{(i)} ) + \lambda w \\
+&= \frac{1}{N} (A \vec{w} - \vec{b}) + \lambda w
+\end{align*}
+
+
+
+
+
+
+
+
+
+
+
+
+
 \subsection{}
+Setting $\nabla \mathcal{E} (\vec{w}, D)$ to zero and using $\vec{w}^*$ which minimizes the loss,
+\begin{align*}
+\nabla \mathcal{E} (\vec{w}, D) &=  \frac{1}{N} (A \vec{w}^* - \vec{b}) + \lambda \vec{w}^* = 0 \\
+0 &= \frac{1}{N} A \vec{w}^* - \frac{1}{N} \vec{b} + \lambda \vec{w}^* \\
+&= A \vec{w} - \vec{b} + \lambda N \vec{w}^* \\
+\implies \vec{b} &= (A + \lambda N) \vec{w}^*
+\end{align*}
+
+
+
+
+
+
+
+
 \subsection{}
+We will prove that all eigenvalues of A are non-negative. If A is positive semi-definite, then all its eigenvalues will be non-negative (ECE421 tutorial \#1 notes).
+
+\begin{align*}
+\vec{v}^T A \vec{v} \geq 0 & \forall \vec{v} \epsilon \mathbb{R}^n \implies A \; \text{is positive semi-definite.} \\
+\text{Recall that:} \; A &=  \sum_{i=1}^N \vec{x}^{(i)}   \vec{x}^{(i)^T}. \\
+\vec{v}^T A \vec{v} &= \vec{v}^T \left( \sum_{i=1}^N \vec{x}^{(i)} \vec{x}^{(i)^T} \right) \vec{v} \\
+&= \sum_{i=1}^N (\vec{v}^T \vec{x}^{(i)} ) (\vec{x}^{(i)^T} \vec{v} ) \\
+&= \sum_{i=1}^N (\vec{v}^T \vec{x}^{(i)} )^2 \geq 0 \qquad \implies \text{A's eigenvalues are non-negative}.
+\end{align*}
+
+
+
+
+
 \subsection{}
+Let $ \textcolor{blue}{A} \vec{v}  = \textcolor{purple}{\alpha} \vec{v} $ where $ \alpha $ is a non-negative eigenvalue of A (as proved in \textbf{3.4}) and $\vec{v}$ be an eigenvector of A.
+
+
+\begin{align*}
+\textcolor{blue}{(A + \lambda N I_d)} \vec{v} &= A \vec{v} + \lambda N \vec{v} \\
+&= \alpha \vec{v} + \lambda N \vec{v} \\
+&= \textcolor{purple}{(\alpha + \lambda N)} \vec{v}
+\end{align*}
+$\alpha \geq 0 $ from \textbf{3.4} and $\lambda N > 0$. Thus, none of the eigenvalues $\textcolor{purple}{(\alpha + \lambda N)}$ of the matrix $\textcolor{blue}{(A + \lambda N I_d)}$ are zero, so the matrix $\textcolor{blue}{(A + \lambda N I_d)}$ is invertible.
+
+
+\subsection{}
+Using the result of \textbf{3.3},
+\begin{align*}
+(A + \lambda N I_d) \vec{w}^* &= \vec{b} \\
+\implies \vec{w}^* &= (A + \lambda N I_d)^{-1} \vec{b}
+\end{align*}
+
+
 
 
 
