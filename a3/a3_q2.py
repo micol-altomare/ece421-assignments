@@ -4,12 +4,15 @@ import numpy as np
 import sklearn
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+
 
 
 # Premable
-iris = load_iris()              # 150 entries
+iris = load_iris()              # 150 entries in total
 iris_hundred = iris.data[:100]  # only the first 100 entries
 
 
@@ -35,29 +38,36 @@ model = LogisticRegression()
 # Train the model
 model.fit(X_train, y_train)
 
-# Plot the decision boundary
 # Create a meshgrid for the plot
 h = .02  # step size in the mesh
 x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
-y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+y_min, y_max = X[:, 1].min() - 1.2, X[:, 1].max() + 1
 xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
-
+print(X[:, 1].min() - 1)
 # Predict the labels for each point in the meshgrid
 Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
 
 # Reshape the predicted labels to match the shape of the meshgrid
 Z = Z.reshape(xx.shape)
 
+# Plot the training points
+scatter = plt.scatter(X_train[:, 0], X_train[:, 1], c=y_train, edgecolors='k', cmap=plt.cm.Paired)
+
 # Plot the decision boundary
 plt.contourf(xx, yy, Z, cmap=plt.cm.Paired, alpha=0.8)
 
-# Plot the training points
-plt.scatter(X_train[:, 0], X_train[:, 1], c=y_train, edgecolors='k', cmap=plt.cm.Paired)
+b = model.intercept_
+w = model.coef_[0]
+a = -w[0] / w[1]
+xx_boundary = np.linspace(3.9, 7)
+yy_boundary = a * xx_boundary - (b[0]) / w[1]
+plt.plot(xx_boundary, yy_boundary, 'k-', c='violet', linewidth=2.5, label='Decision Boundary')
+
 plt.xlabel('Sepal Length (cm)')
 plt.ylabel('Sepal Width (cm)')
-# TODO: add legend
-plt.title('Binary Linear Classifier Decision Boundary') # TODO: improve title
-plt.show() # TODO: when I zoom in on the deicision boundary, it looks like it's not a straight line + multiple colours. Why is that?
+plt.title('Binary Linear Classifier') 
+plt.legend(loc='upper right')
+plt.show() 
 
 
 
@@ -70,3 +80,107 @@ training_accuracy = model.score(X_train, y_train)
 test_accuracy = model.score(X_test, y_test)
 print('Training Accuracy: ', training_accuracy) # TODO: why is it 100%?
 print('Test Accuracy: ', test_accuracy)
+
+# Question 2.3
+'''
+(2 points) Implement a linear SVM classifier on the first two dimensions (sepal 
+length and width). Plot the decision boundary of the classifier and its margins.
+'''
+
+# Create a linear SVM classifier
+svm_classifier = SVC(kernel='linear', C=1000) #* what is c?
+svm_classifier.fit(X_train, y_train)
+
+# Plot the decision boundary and margins
+plt.figure(figsize=(8, 6))
+
+# Plot the training points
+plt.scatter(X_train[:, 0], X_train[:, 1], c=y_train, cmap=plt.cm.Paired, edgecolors='k', marker='o', s=100, label='Training Points')
+
+
+# Plot the decision boundary
+ax = plt.gca()
+xlim = ax.get_xlim()
+ylim = ax.get_ylim()
+
+# Create grid to evaluate model
+xx, yy = np.meshgrid(np.linspace(xlim[0], xlim[1], 100), np.linspace(ylim[0], ylim[1], 100))
+Z = svm_classifier.decision_function(np.c_[xx.ravel(), yy.ravel()])
+
+# Plot decision boundary and margins
+Z = Z.reshape(xx.shape)
+contour = plt.contour(xx, yy, Z, colors='k', levels=[-1, 0, 1], alpha=0.5, linestyles=['-.', '-', '--'], label='_nolegend_')
+
+# TODO: verify difference between +ve and -ve classes and make sure the legend is correct
+
+# Plot support vectors
+support_vectors = plt.scatter(svm_classifier.support_vectors_[:, 0], svm_classifier.support_vectors_[:, 1], s=200, facecolors='none',
+            edgecolors='g', marker='o', linewidth = 1.5, label='Support Vectors')
+
+legend_labels = ['Negative Margin', 'Decision Boundary', 'Positive Margin']
+
+legend_handles = [
+    Line2D([0], [0], color='k', linestyle='-.', label=legend_labels[0]),
+    Line2D([0], [0], color='k', linestyle='-', label=legend_labels[1]),
+    Line2D([0], [0], color='k', linestyle='--', label=legend_labels[2]),
+    support_vectors
+]
+
+plt.legend(handles=legend_handles)
+
+plt.title('Linear SVM Decision Boundary and Margins')
+plt.xlabel('Sepal Length (cm)')
+plt.ylabel('Sepal Width (cm)')
+plt.show()
+
+
+# Question 2.4
+'''
+(1 point) Circle the support vectors. Please justify how to identify them 
+through the duality theorem. (hint: KKT condition)
+'''
+
+# The support vectors are circled in green in the previous figure. Support vectors are identified...
+# TODO: skipped until the tutorial covers this
+
+
+# Question 2.5
+'''
+(1 point) Report the accuracy of your linear SVM classifier on both the 
+training and test sets.
+'''
+
+training_accuracy = svm_classifier.score(X_train, y_train)
+test_accuracy = svm_classifier.score(X_test, y_test)
+print('Training Accuracy: ', training_accuracy)     # 100%
+print('Test Accuracy: ', test_accuracy)             # 100%
+# TODO: double check accuracy scores
+
+
+# Question 2.6
+'''
+(1 point) What is the value of the margin? Justify your answer.
+'''
+# Recall that the margin is equal to 2/(||w||^2), where w is the weight vector.
+weight = svm_classifier.coef_[0] # = [ 3.33266363 -3.33342658]
+margin = 2 / (np.linalg.norm(weight)) # = 0.42430075463962524
+# Thus, the margin is equal to approximately 0.424.
+# TODO: add more justification?
+
+# Question 2.7
+'''
+(1 point) Which vector is orthogonal to the decision boundary?
+'''
+# The vector orthogonal to the decision boundary is the weight vector, w.
+# TODO: add justification?
+
+
+# Question 2.8
+'''
+(3 points) Split the iris dataset again in a training and test set, this time 
+setting test size to 0.4 when calling train test split. Train the SVM classifier 
+again. Does the decision boundary change? How about the test accuracy? Please 
+justify why (hint: think about the support vectors), and illustrate your 
+argument with a new plot.
+'''
+
