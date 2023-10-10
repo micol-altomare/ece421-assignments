@@ -356,5 +356,5 @@ print('Training Accuracy: ', training_accuracy)     # = 0.8444444444444444
 print('Test Accuracy: ', test_accuracy)             # = 0.7
 
 # Although the accuracy of the polynomial SVM classifier is not as high as the
-# linear SVM classifier, it is able classify the data points with a reasonable
-# accuracy. 
+# linear SVM classifier with only 2 classes, it is able classify the data points 
+# with a reasonable accuracy. 
