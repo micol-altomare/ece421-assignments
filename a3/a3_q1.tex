@@ -28,8 +28,7 @@
 
 
 \subsection{}
-By inspection, the equation of the maximum-margin hyperplane is $\boxed{x_2=-x_1+1.5}$. %%%% CHECK format!!!! (refer to video notes)
-
+By inspection, the equation of the maximum-margin hyperplane is $\boxed{x_2=-x_1+1.5}$ (and the equation of the margins is $x_2=-x_1+1.5 \pm 0.5$).
 
 \begin{figure}[ht]
   \centering
@@ -46,27 +45,26 @@ By inspection, the equation of the maximum-margin hyperplane is $\boxed{x_2=-x_1
       ]
       
      \addplot[only marks, mark=*] coordinates {
-        (1, 1) % x1 (Red)
-        (-1, -1) % x2 (Blue)
-        (1, 0) % x3 (Blue)
-        (0, 1) % x4 (Blue)
+        (1, 1) 
+        (-1, -1)
+        (1, 0) 
+        (0, 1) 
       };
       \addlegendentry{Toy dataset}
-      \addplot [dotted, domain=-2:2, samples=2, ultra thick] {-1*x + 1.5};
-      \addlegendentry{Max-margin hyperplane} 
+      \addplot [domain=-2:2, samples=2, ultra thick] {-1*x + 1.5};
+      \addlegendentry{Decision boundary} ;
+      \addplot [dashed, domain=-2:2, samples=2] {-x+1};
+        \addplot [dashed, domain=-2:2, samples=2] {-x+2};
     \end{axis}
   \end{tikzpicture}
-  \caption{Scatter plot of the toy dataset.}
+  \caption{Scatter plot and max-margin hyperplane of the toy dataset.}
 \end{figure}
-
-% TODO: labelling + caption
-% TODO: ensure correc form for the hyperplane equation
 
 
 
 \subsection{}
-$\boxed{x^{(1)}, x^{(3)}, x^{(4)}}$ are support vectors since they are closest to the hyperplane, and since their margin constraint will be 1 (ie. they are on the margin).
-% TODO: double check reasoning
+$\boxed{x^{(1)}, x^{(3)}, x^{(4)}}$ are support vectors since they are the closest points to the hyperplane (assuming no slack variables), and since their margin constraint will be equal to 1 (ie. \textbf{they are on the margin}).
+
 
 \subsection{}
 Recall the Lagrange function: $$ L (\bar{x}, \lambda) = f_0 (\bar{x}) + \sum_{i=1} \lambda_i f_i (\bar{x}), \lambda_i \geq 0 $$

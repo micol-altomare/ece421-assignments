@@ -11,7 +11,7 @@ from matplotlib.lines import Line2D
 
 
 
-# Premable
+# Preamble
 iris = load_iris()              # 150 entries in total
 iris_hundred = iris.data[:100]  # only the first 100 entries
 
@@ -101,7 +101,6 @@ plt.figure(figsize=(8, 6))
 # Plot the training points
 plt.scatter(X_train[:, 0], X_train[:, 1], c=y_train, cmap=plt.cm.Paired, edgecolors='k', marker='o', s=100, label='Training Points')
 
-
 # Plot the decision boundary
 ax = plt.gca()
 xlim = ax.get_xlim()
@@ -113,9 +112,7 @@ Z = svm_classifier.decision_function(np.c_[xx.ravel(), yy.ravel()])
 
 # Plot decision boundary and margins
 Z = Z.reshape(xx.shape)
-contour = plt.contour(xx, yy, Z, colors='k', levels=[-1, 0, 1], alpha=0.5, linestyles=['-.', '-', '--'], label='_nolegend_')
-
-# TODO: verify difference between +ve and -ve classes (correct sides) and make sure the legend is correct
+contour = plt.contour(xx, yy, Z, colors='k', levels=[-1, 0, 1], alpha=0.5, linestyles=['--', '-', '--'], label='_nolegend_')
 
 # Plot support vectors
 support_vectors = plt.scatter(svm_classifier.support_vectors_[:, 0], svm_classifier.support_vectors_[:, 1], s=200, facecolors='none',
@@ -127,12 +124,12 @@ print('Weight vector of SVM with test_size=0.8: ', w_first) # [ 3.33266363 -3.33
 print('Bias of SVM with test_size=0.8: ', b_first) # [-7.66277845]
 
 
-legend_labels = ['Negative Margin', 'Decision Boundary', 'Positive Margin']
+legend_labels = ['Decision Boundary', 'Margins']
 
 legend_handles = [
-    Line2D([0], [0], color='k', linestyle='-.', label=legend_labels[0]),
-    Line2D([0], [0], color='k', linestyle='-', label=legend_labels[1]),
-    Line2D([0], [0], color='k', linestyle='--', label=legend_labels[2]),
+    Line2D([0], [0], color='k', linestyle='-', label=legend_labels[0]),
+    Line2D([0], [0], color='k', linestyle='--', label=legend_labels[1]),
+    #Line2D([0], [0], color='k', linestyle='--', label=legend_labels[2]),
     support_vectors
 ]
 
@@ -183,8 +180,8 @@ margin = 2 / (np.linalg.norm(weight)) # = 0.42430075463962524
 '''
 (1 point) Which vector is orthogonal to the decision boundary?
 '''
-# This is because the decision boundary is defined by the equation w^T * x + b = 0,
-# it follows that the vector orthogonal to the decision boundary is the weight vector, w.
+# As the decision boundary is defined by the equation w^T * x + b = 0, it follows 
+# that the vector orthogonal to the decision boundary is the weight vector, w.
 
 
 
@@ -200,7 +197,6 @@ argument with a new plot.
 
 X_train, X_test, y_train, y_test = train_test_split(iris_hundred[:, :2], iris.target[:100], test_size=0.4, random_state=0)
 
-
 # Create a linear SVM classifier
 svm_classifier = SVC(kernel='linear', C=1000) 
 svm_classifier.fit(X_train, y_train)
@@ -210,7 +206,6 @@ plt.figure(figsize=(8, 6))
 
 # Plot the training points
 plt.scatter(X_train[:, 0], X_train[:, 1], c=y_train, cmap=plt.cm.Paired, edgecolors='k', marker='o', s=100, label='Training Points')
-
 
 # Plot the decision boundary
 ax = plt.gca()
@@ -223,20 +218,17 @@ Z = svm_classifier.decision_function(np.c_[xx.ravel(), yy.ravel()])
 
 # Plot decision boundary and margins
 Z = Z.reshape(xx.shape)
-contour = plt.contour(xx, yy, Z, colors='k', levels=[-1, 0, 1], alpha=0.5, linestyles=['-.', '-', '--'], label='_nolegend_')
-
-# TODO: verify difference between +ve and -ve classes (correct sides) and make sure the legend is correct
+contour = plt.contour(xx, yy, Z, colors='k', levels=[-1, 0, 1], alpha=0.5, linestyles=['--', '-', '--'], label='_nolegend_')
 
 # Plot support vectors
 support_vectors = plt.scatter(svm_classifier.support_vectors_[:, 0], svm_classifier.support_vectors_[:, 1], s=200, facecolors='none',
             edgecolors='g', marker='o', linewidth = 1.5, label='Support Vectors')
 
-legend_labels = ['Negative Margin', 'Decision Boundary', 'Positive Margin']
+legend_labels = ['Decision Boundary', 'Margins']
 
 legend_handles = [
-    Line2D([0], [0], color='k', linestyle='-.', label=legend_labels[0]),
-    Line2D([0], [0], color='k', linestyle='-', label=legend_labels[1]),
-    Line2D([0], [0], color='k', linestyle='--', label=legend_labels[2]),
+    Line2D([0], [0], color='k', linestyle='-', label=legend_labels[0]),
+    Line2D([0], [0], color='k', linestyle='--', label=legend_labels[1]),
     support_vectors
 ]
 
@@ -321,26 +313,23 @@ y = iris.target
 X_train, X_test, y_train, y_test = train_test_split(iris_full[:, :2], iris.target, test_size=0.4, random_state=0)
 
 
-
-# create a polynomial SVM classifier
+# Polynomial SVM classifier
 svm_classifier_poly = SVC(kernel='poly', C=1, random_state=0)
 svm_classifier_poly.fit(X_train, y_train)
 
 plt.scatter(X_train[:, 0], X_train[:, 1], c=y_train, cmap=plt.cm.Paired, edgecolors='k', marker='o', s=100, label='Training Points')
 
-# create a meshgrid for the plot
+# Meshgrid for the plot
 h = .02  # step size in the mesh
 x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
 y_min, y_max = X[:, 1].min() - 1.2, X[:, 1].max() + 1
 xx, yy = np.meshgrid(np.arange(x_min, x_max, h), np.arange(y_min, y_max, h))
 
-# predict the labels for each point in the meshgrid
+# Predict the labels for each point in the meshgrid
 Z = svm_classifier_poly.predict(np.c_[xx.ravel(), yy.ravel()])
-# reshape the predicted labels to match the shape of the meshgrid
 Z = Z.reshape(xx.shape)
 plt.contourf(xx, yy, Z, cmap=plt.cm.Paired, alpha=0.5)
 
-# plot subtitles and title
 plt.title('Polynomial SVM Classifier')
 plt.xlabel('Sepal Length (cm)')
 plt.ylabel('Sepal Width (cm)')
